@@ -27,7 +27,12 @@ userRouter.post('/', async (req, res, next) => {
 userRouter.get('/newgame/:id', async (req, res, next) => {
     // Starts new game, gives player 20 points.
     try {
-        // TODO UPDATE 20 points
+        const updatePlayer = { points: 20 }
+        const updatedPlayer = await User.findByIdAndUpdate(req.params.id, updatePlayer, { new: true })
+        const clicksToWin = await gameService.calculateClicksToNextWin()
+        const gameMessage = 'New game started!'
+
+        return res.json({ updatedPlayer, clicksToWin, gameMessage })
     } catch (error) {
         next(error)
     }
@@ -40,7 +45,6 @@ userRouter.get('/', async (req, res) => {
 
 // handles click, gives points
 userRouter.get('/click/:id', async (req, res, next) => {
-    // TODO ADD RULE 0 POINTS GAME OVER
     try {
         let player = await User.findById(req.params.id)
         // click costs 1 point
@@ -50,6 +54,7 @@ userRouter.get('/click/:id', async (req, res, next) => {
         const wins = await gameService.calculateWins()
 
         // update user points to user db
+        // Confirm that updates only that one field to DB!!!
         const updatePlayer = { points: player.points + wins }
         const updatedPlayer = await User.findByIdAndUpdate(req.params.id, updatePlayer, { new: true })
 
