@@ -23,7 +23,6 @@ const getCounter = async () => {
     return game.counter
 }
 
-// rename
 const calculateWins = async () => {
     // get counter
     const counter = await getCounter()
@@ -31,7 +30,7 @@ const calculateWins = async () => {
     // add one to counter
     const newCounter = { counter: counter + 1 }
 
-    await Game.findOneAndUpdate({}, newCounter) // no need to be await
+    await Game.findOneAndUpdate({}, newCounter)
 
     // calculate points
     const wins = getPoints(newCounter.counter)
