@@ -40,6 +40,7 @@ userRouter.get('/', async (req, res) => {
 
 // handles click, gives points
 userRouter.get('/click/:id', async (req, res, next) => {
+    // TODO ADD RULE 0 POINTS GAME OVER
     try {
         let player = await User.findById(req.params.id)
         // click costs 1 point
