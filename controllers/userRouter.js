@@ -77,4 +77,18 @@ userRouter.get('/click/:id', async (req, res, next) => {
     }
 })
 
+// returns player points and clicks to next win
+userRouter.get('/gamestatus/:id', async (req, res, next) => {
+    try {
+        const player = await User.findById(req.params.id)
+        const points = player.points
+
+        const clicksToWin = await gameService.calculateClicksToNextWin()
+
+        return res.json({ points, clicksToWin })
+    } catch(error) {
+        next(error)
+    }
+})
+
 module.exports = userRouter
