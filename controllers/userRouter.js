@@ -2,6 +2,15 @@ const bcrypt = require('bcryptjs')
 const userRouter = require('express').Router()
 const User = require('../models/User')
 const gameService = require('../services/gameService')
+const jwt = require('jsonwebtoken')
+
+const getToken = req => {
+    const authorization = req.get('authorization')
+    if(authorization && authorization.toLowerCase().startsWith('bearer ')) {
+        return authorization.substring(7)
+    }
+    return null
+}
 
 // Base url is set to /api/users
 userRouter.post('/', async (req, res, next) => {
@@ -27,8 +36,14 @@ userRouter.post('/', async (req, res, next) => {
 userRouter.get('/newgame/:id', async (req, res, next) => {
     // Starts new game, gives player 20 points.
     try {
+        const token = getToken(req)
+        const decodedToken = jwt.verify(token, process.env.SECRET)
+        if(!token || !decodedToken.id) {
+            return res.status(401).json({ error: 'Token missing or invalid.' })
+        }
+
         const updatePlayer = { points: 20 }
-        const updatedPlayer = await User.findByIdAndUpdate(req.params.id, updatePlayer, { new: true })
+        const updatedPlayer = await User.findByIdAndUpdate(decodedToken.id, updatePlayer, { new: true })
         const clicksToWin = await gameService.calculateClicksToNextWin()
         const gameMessage = 'New game started!'
 
@@ -46,7 +61,13 @@ userRouter.get('/', async (req, res) => {
 // handles click, gives points
 userRouter.get('/click/:id', async (req, res, next) => {
     try {
-        let player = await User.findById(req.params.id)
+        const token = getToken(req)
+        const decodedToken = jwt.verify(token, process.env.SECRET)
+        if(!token || !decodedToken.id) {
+            return res.status(401).json({ error: 'Token missing or invalid.' })
+        }
+
+        let player = await User.findById(decodedToken.id)
         // click costs 1 point
         player.points = player.points - 1
 
@@ -56,7 +77,7 @@ userRouter.get('/click/:id', async (req, res, next) => {
         // update user points to user db
         // Confirm that updates only that one field to DB!!!
         const updatePlayer = { points: player.points + wins }
-        const updatedPlayer = await User.findByIdAndUpdate(req.params.id, updatePlayer, { new: true })
+        const updatedPlayer = await User.findByIdAndUpdate(decodedToken.id, updatePlayer, { new: true })
 
         // Game message
         let gameMessage = 'No wins, better luck next time.'
