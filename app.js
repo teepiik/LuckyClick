@@ -38,6 +38,7 @@ app.use(middleware.requestLogger)
 app.use('/api/users', userRouter)
 app.use('/api/login', loginRouter)
 app.use(middleware.errorHandler)
+app.use(express.static('build'))
 
 app.get('/', (req, res) => {
     res.send('Hello server')
