@@ -1,6 +1,6 @@
 # LuckyClick
 Lucky Click is small online multiplayer game for programming practice.
-Game is playable in ADD LINK TO PRODUCTION. This repository
+Game is playable [HERE](https://luckyclick8.herokuapp.com/). This repository
 contains back-end code and production build of the front-end code.
 Front-end code can be found [here](https://github.com/teepiik/LuckyClick_Frontend).
 
